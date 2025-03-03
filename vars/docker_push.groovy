@@ -1,12 +1,19 @@
-def call(String Project, String ImageTag, String DockerHubUser){
-    
-    withCredentials([usernamePassword(credentialsId: 'dockerHubCred', passwordVariable: 'dockerHubPass', usernameVariable: 'dockerHubUser')]){
-        echo "Logging to DockerHub"
-        sh "docker login -u ${dockerHubUser} -p ${dockerHubPass}"
-        echo "Login to Dockerhub Successfull"
-        
+stage("Docker: Image Push to DockerHub") {
+    steps {
+        script {
+            withCredentials([usernamePassword(credentialsId: 'dockerHubCred', passwordVariable: 'dockerHubPass', usernameVariable: 'dockerHubUser')]){
+                echo "Logging into DockerHub"
+                
+                // Log in to DockerHub using the provided credentials
+                sh "docker login -u ${dockerHubUser} -p ${dockerHubPass}"
+                echo "Login to DockerHub successful"
+            }
+
+            echo "Pushing image to Docker Hub"
+
+            // Push the Docker image to DockerHub using the provided variables
+            sh "docker push ${dockerHubUser}/${Project}:${ImageTag}"
+            echo "Image pushed successfully to Docker Hub"
+        }
     }
-    echo "This is pushing image to Docker Hub"
-    sh "docker push ${DockerHubUser}/${Project}:${ImageTag}"
-    echo "Image pushed successfully to Docker Hub"
 }
